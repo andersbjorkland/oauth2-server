@@ -1,0 +1,7 @@
+/vendor
+/security/*
+!/security/.gitkeep
+
+.env.local
+
+.idea/

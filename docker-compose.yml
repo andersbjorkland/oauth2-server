@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  database:
+    image: "mariadb:10.9.4"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: main
+      MYSQL_USER: test
+      MYSQL_PASSWORD: password
+    expose:
+      - "5432:3306"
+    volumes:
+      - ./.docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - db-data:/var/lib/mysql:rw
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD
+      interval: 1s
+      retries: 10
+volumes:
+  db-data:
