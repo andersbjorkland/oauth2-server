@@ -8,8 +8,6 @@ services:
       MYSQL_DATABASE: main
       MYSQL_USER: test
       MYSQL_PASSWORD: password
-    expose:
-      - "5432:3306"
     volumes:
       - ./.docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
       - db-data:/var/lib/mysql:rw
@@ -17,5 +15,7 @@ services:
       test: mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD
       interval: 1s
       retries: 10
+    ports:
+      - "3306:3306"
 volumes:
   db-data:
