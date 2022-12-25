@@ -5,27 +5,39 @@ declare(strict_types=1);
 namespace App\Model;
 
 use League\OAuth2\Server\Entities\ClientEntityInterface;
+use League\OAuth2\Server\Entities\Traits\ClientTrait;
 
 class Client implements ClientEntityInterface
 {
+    public function __construct(
+        private readonly string $name,
+        private readonly string $redirectUri,
+        private readonly bool $isConfidential = false,
+        private readonly ?string $id = null,
+    ){}
 
     public function getIdentifier()
     {
-        // TODO: Implement getIdentifier() method.
+        return 'id';
     }
 
-    public function getName()
+    public function getName(): string
     {
-        // TODO: Implement getName() method.
+        return $this->name;
     }
 
-    public function getRedirectUri()
+    public function getRedirectUri(): array|string
     {
-        // TODO: Implement getRedirectUri() method.
+        return $this->redirectUri;
     }
 
-    public function isConfidential()
+    public function isConfidential(): bool
     {
-        // TODO: Implement isConfidential() method.
+        return $this->isConfidential;
+    }
+    
+    public function getId(): ?string
+    {
+        return $this->id;
     }
 }

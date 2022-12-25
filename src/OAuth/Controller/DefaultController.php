@@ -21,21 +21,33 @@ class DefaultController
     {
         $errorMessage = null;
         $successMessage = null;
+        $createClientSuccess = await($this->connection->query(InitializeDatabase::getCreateClientTableSQL())
+            ->then(
+                function (QueryResult $result) {
+                    return true;
+                },
+                function (\Exception $exception) {
+                    return false;
+                },
+            ));
+        assert(is_bool($createClientSuccess));
         
-         $response = await($this->connection->query(InitializeDatabase::getCreateUserTableSQL())
+         $createUserSuccess = await($this->connection->query(InitializeDatabase::getCreateUserTableSQL())
                 ->then(
                     function (QueryResult $result) {
-                        $this->connection->quit();
-                        return Response::plaintext('Success!');   
+                        return true;
                     },
                     function (\Exception $exception) {
-                        $this->connection->quit();
-                        return Response::plaintext('Error! ' . $exception->getMessage());
+                        return false;
                     },
                 ));
-         
-         assert($response instanceof ResponseInterface);
-         
-         return $response;
+        assert(is_bool($createUserSuccess));
+
+        $this->connection->quit();
+
+        return Response::json([
+            'createdUserTable' => $createUserSuccess,
+            'createdClientTable' => $createClientSuccess,
+        ]);
     }
 }

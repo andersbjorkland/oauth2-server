@@ -29,7 +29,7 @@ $app = new App($container);
 $app->get('/', DefaultController::class);
 
 // register new user
-$app->post('/register', RegisterController::class);
+$app->post('/register/{type}', RegisterController::class);
 
 $app->post('/login', LoginController::class);
 
