@@ -13,7 +13,7 @@ class InitializeDatabase
     
     public static function getCreateClientTableSQL(): string
     {
-        $sql = "CREATE TABLE IF NOT EXISTS client (id BINARY(32) NOT NULL COMMENT '(Type:uuid4)', redirect_uri VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL, is_confidential TINYINT(1) NOT NULL, UNIQUE INDEX UNIQ_C74404555E237E06 (name), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB";
+        $sql = "CREATE TABLE IF NOT EXISTS client (id BINARY(32) NOT NULL COMMENT '(Type:uuid4)', redirect_uri VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL, is_confidential TINYINT(1) NOT NULL, secret BINARY(64) DEFAULT NULL, UNIQUE INDEX UNIQ_C74404555E237E06 (name), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB";
         
         return $sql;
     }

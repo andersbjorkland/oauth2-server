@@ -82,10 +82,18 @@ class RegisterController
         
         $name = $data->name;
         $redirectUri = $data->redirect_uri;
-        
+        try {
+            $secret = bin2hex(random_bytes(32));
+        } catch (\Exception $e) {
+            return Response::json(
+                ['error' => 'Failed to generate secret.']
+            )->withStatus(StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR);
+        }
+
         $client = new Client(
             name: $name,
             redirectUri: $redirectUri,
+            secret: $secret
         );
         
         try {
@@ -101,7 +109,7 @@ class RegisterController
         }
         
         return Response::json(
-            ['message' => 'User created successfully.']
+            ['message' => 'Client created successfully.']
         )->withStatus(StatusCodeInterface::STATUS_CREATED);
     }
 }

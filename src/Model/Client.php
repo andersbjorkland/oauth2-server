@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace App\Model;
 
 use League\OAuth2\Server\Entities\ClientEntityInterface;
-use League\OAuth2\Server\Entities\Traits\ClientTrait;
 
 class Client implements ClientEntityInterface
 {
     public function __construct(
-        private readonly string $name,
-        private readonly string $redirectUri,
-        private readonly bool $isConfidential = false,
-        private readonly ?string $id = null,
+        private string $name,
+        private string $redirectUri,
+        private bool $isConfidential = false,
+        private ?string $secret = null,
+        private ?string $id = null,
     ){}
 
-    public function getIdentifier()
+    public function getIdentifier(): string
     {
         return 'id';
     }
@@ -40,4 +40,53 @@ class Client implements ClientEntityInterface
     {
         return $this->id;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getSecret(): ?string
+    {
+        return $this->secret;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @param string $redirectUri
+     */
+    public function setRedirectUri(string $redirectUri): void
+    {
+        $this->redirectUri = $redirectUri;
+    }
+
+    /**
+     * @param bool $isConfidential
+     */
+    public function setIsConfidential(bool $isConfidential): void
+    {
+        $this->isConfidential = $isConfidential;
+    }
+
+    /**
+     * @param string|null $secret
+     */
+    public function setSecret(?string $secret): void
+    {
+        $this->secret = $secret;
+    }
+
+    /**
+     * @param string|null $id
+     */
+    public function setId(?string $id): void
+    {
+        $this->id = $id;
+    }
+    
 }

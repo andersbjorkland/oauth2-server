@@ -23,18 +23,23 @@ class ClientManager implements EntityManagerInterface
     public function create(mixed $entity): bool
     {
         assert($entity instanceof Client);
-        $sql = 'INSERT INTO client (id, name, redirect_uri, is_confidential) VALUES (?, ?, ?, ?)';
-        return await($this->connection->query($sql, [$entity->getId() ?? UuidGenerator::getCompactUuid4(), $entity->getName(), $entity->getRedirectUri(), $entity->isConfidential()])
-            ->then(
-                function (QueryResult $result) {
-                    $this->connection->quit();
-                    return true;
-                },
-                function (\Exception $exception) {
-                    $this->connection->quit();
-                    throw $exception;
-                },
-            ));
+        $sql = 'INSERT INTO client (id, name, redirect_uri, is_confidential, secret) VALUES (?, ?, ?, ?, ?)';
+        return await($this->connection->query($sql, [
+            $entity->getId() ?? UuidGenerator::getCompactUuid4(), 
+            $entity->getName(), 
+            $entity->getRedirectUri(), 
+            $entity->isConfidential(), 
+            $entity->getSecret()
+        ])->then(
+            function (QueryResult $result) {
+                $this->connection->quit();
+                return true;
+            },
+            function (\Exception $exception) {
+                $this->connection->quit();
+                throw $exception;
+            },
+        ));
     }
 
     /**
@@ -43,18 +48,23 @@ class ClientManager implements EntityManagerInterface
     public function update(mixed $entity): bool
     {
         assert($entity instanceof Client);
-        $sql = 'UPDATE client SET name = ?, redirect_uri = ?, is_confidential = ? WHERE id = ?';
-        return await($this->connection->query($sql, [$entity->getName(), $entity->getRedirectUri(), $entity->isConfidential(), $entity->getId()])
-            ->then(
-                function (QueryResult $result) {
-                    $this->connection->quit();
-                    return true;
-                },
-                function (\Exception $exception) {
-                    $this->connection->quit();
-                    throw $exception;
-                },
-            ));
+        $sql = 'UPDATE client SET name = ?, redirect_uri = ?, is_confidential = ?, secret = ? WHERE id = ?';
+        return await($this->connection->query($sql, [
+            $entity->getName(), 
+            $entity->getRedirectUri(), 
+            $entity->isConfidential(), 
+            $entity->getSecret(),
+            $entity->getId()
+        ])->then(
+            function (QueryResult $result) {
+                $this->connection->quit();
+                return true;
+            },
+            function (\Exception $exception) {
+                $this->connection->quit();
+                throw $exception;
+            },
+        ));
     }
 
     /**

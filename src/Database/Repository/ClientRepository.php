@@ -51,8 +51,23 @@ class ClientRepository implements ClientRepositoryInterface
         return self::createClientFromRow($result[0]);
     }
 
-    public function validateClient($clientIdentifier, $clientSecret, $grantType)
+    public function validateClient($clientIdentifier, $clientSecret, $grantType): bool
     {
-        // TODO: Implement validateClient() method.
+        $sql = 'SELECT * FROM client WHERE id = ? AND secret = ?';
+        $result = await($this->connection->query($sql, [$clientIdentifier, $clientSecret])
+            ->then(
+                function (QueryResult $result) {
+                    $this->connection->quit();
+                    return $result->resultRows;
+                },
+                function (\Exception $exception) {
+                    $this->connection->quit();
+                    throw $exception;
+                },
+            ));
+        if (count($result) === 0) {
+            return false;
+        }
+        return true;
     }
 }
