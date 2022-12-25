@@ -6,6 +6,7 @@ namespace App\OAuth\Controller;
 
 use App\Database\Manager\UserManager;
 use App\Model\User;
+use App\OAuth\Validator\UserRequestValidator;
 use Fig\Http\Message\StatusCodeInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -20,21 +21,16 @@ class RegisterController
     public function __invoke(ServerRequestInterface $request): ResponseInterface
     {
         $data = json_decode((string)$request->getBody());
-        
-        
-        if (empty($data)) {
+
+        $validationResponse = (new UserRequestValidator())->validateRequest($data);
+        if (!$validationResponse->isValid()) {
             return Response::json(
-                ['error' => 'Expected data.']
+                $validationResponse->getErrors()
             )->withStatus(StatusCodeInterface::STATUS_BAD_REQUEST);
         }
-        
-        $email = $data->email ?? null;
-        $password = $data->password ?? null;
-        if ($email === null || $password === null) {
-            return Response::json(
-                ['error' => 'Failure: missing email and/or password!']
-            )->withStatus(StatusCodeInterface::STATUS_BAD_REQUEST);
-        }
+
+        $email = $data->email;
+        $password = $data->password;
         
         $user = new User(
             email: $email,

@@ -1,8 +1,9 @@
 <?php
 
-use App\Database\Manager\EntityManagerInterface;
 use App\Database\Manager\UserManager;
+use App\Database\Repository\UserRepository;
 use App\OAuth\Controller\DefaultController;
+use App\OAuth\Controller\LoginController;
 use App\OAuth\Controller\RegisterController;
 use Dotenv\Dotenv;
 use FrameworkX\App;
@@ -20,6 +21,7 @@ $container = new Container([
         return (new Factory())->createLazyConnection($MYSQL_URI);
     },
     UserManager::class => fn(ConnectionInterface $connection) => new UserManager($connection),
+    UserRepository::class => fn(ConnectionInterface $connection) => new UserRepository($connection),
 ]);
 
 $app = new App($container);
@@ -28,5 +30,7 @@ $app->get('/', DefaultController::class);
 
 // register new user
 $app->post('/register', RegisterController::class);
+
+$app->post('/login', LoginController::class);
 
 $app->run();
