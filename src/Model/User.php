@@ -17,7 +17,7 @@ class User implements UserEntityInterface
 
     public function getIdentifier(): string
     {
-        return 'id';
+        return $this->id;
     }
 
     /**

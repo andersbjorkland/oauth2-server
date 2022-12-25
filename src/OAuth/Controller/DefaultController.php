@@ -42,12 +42,24 @@ class DefaultController
                     },
                 ));
         assert(is_bool($createUserSuccess));
+        
+        $createScopeSuccess = await($this->connection->query(InitializeDatabase::getCreateScopeTableSQL())
+                ->then(
+                    function (QueryResult $result) {
+                        return true;
+                    },
+                    function (\Exception $exception) {
+                        return false;
+                    },
+                ));
+        assert(is_bool($createScopeSuccess));
 
         $this->connection->quit();
 
         return Response::json([
             'createdUserTable' => $createUserSuccess,
             'createdClientTable' => $createClientSuccess,
+            'createdScopeTable' => $createScopeSuccess,
         ]);
     }
 }

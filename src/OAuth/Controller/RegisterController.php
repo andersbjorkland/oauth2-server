@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace App\OAuth\Controller;
 
 use App\Database\Manager\ClientManager;
+use App\Database\Manager\ScopeManager;
 use App\Database\Manager\UserManager;
+use App\Database\Service\UuidGenerator;
 use App\Model\Client;
+use App\Model\Scope;
 use App\Model\User;
 use App\OAuth\Validator\ClientRequestValidator;
+use App\OAuth\Validator\ScopeRequestValidator;
 use App\OAuth\Validator\UserRequestValidator;
 use Fig\Http\Message\StatusCodeInterface;
 use Psr\Http\Message\RequestInterface;
@@ -20,7 +24,8 @@ class RegisterController
 {
     public function __construct(
         private readonly UserManager $userManager,
-        private readonly ClientManager $clientManager
+        private readonly ClientManager $clientManager,
+        private readonly ScopeManager $scopeManager
     ){}
     
     public function __invoke(ServerRequestInterface $request): ResponseInterface
@@ -29,6 +34,7 @@ class RegisterController
         return match ($type) {
             'user' => $this->registerUser($request),
             'client' => $this->registerClient($request),
+            'scope' => $this->registerScope($request),
             default => new Response(StatusCodeInterface::STATUS_NOT_FOUND),
         };
     }
@@ -110,6 +116,43 @@ class RegisterController
         
         return Response::json(
             ['message' => 'Client created successfully.']
+        )->withStatus(StatusCodeInterface::STATUS_CREATED);
+    }
+    
+    public function registerScope(RequestInterface $request): ResponseInterface
+    {
+        $data = json_decode((string)$request->getBody());
+        
+        $validationResponse = (new ScopeRequestValidator())->validateRequest($data);
+        if (!$validationResponse->isValid()) {
+            return Response::json(
+                $validationResponse->getErrors()
+            )->withStatus(StatusCodeInterface::STATUS_BAD_REQUEST);
+        }
+        
+        $name = $data->name;
+        $description = $data->description ?? null;
+        
+        $scope = new Scope(
+            name: $name,
+            description: $description,
+            id: UuidGenerator::getCompactUuid4()
+        );
+        
+        try {
+            $result = $this->scopeManager->create($scope);
+        } catch (\Throwable $exception) {
+            return Response::json(
+                [
+                    'error' => str_contains($exception->getMessage(), 'Duplicate entry')
+                        ? 'Name already exists.'
+                        : 'Database failure.'
+                ]
+            )->withStatus(StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR);
+        }
+        
+        return Response::json(
+            ['message' => 'Scope created successfully.']
         )->withStatus(StatusCodeInterface::STATUS_CREATED);
     }
 }

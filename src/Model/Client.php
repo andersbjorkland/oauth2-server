@@ -18,7 +18,7 @@ class Client implements ClientEntityInterface
 
     public function getIdentifier(): string
     {
-        return 'id';
+        return $this->id;
     }
 
     public function getName(): string

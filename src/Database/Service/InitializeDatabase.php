@@ -17,5 +17,11 @@ class InitializeDatabase
         
         return $sql;
     }
+    
+    public static function getCreateScopeTableSQL(): string
+    {
+        $sql = "CREATE TABLE scope (id BINARY(32) NOT NULL, name VARCHAR(255) NOT NULL, description VARCHAR(255) DEFAULT NULL, UNIQUE INDEX UNIQ_AF55D35E237E06 (name), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB";
+        return $sql;
+    }
 
 }
