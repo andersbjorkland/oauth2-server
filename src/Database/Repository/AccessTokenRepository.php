@@ -30,7 +30,9 @@ class AccessTokenRepository extends AbstractRepository implements AccessTokenRep
             new DateTimeImmutable(),
             $userIdentifier,
             $clientEntity,
-            new CryptKey(__DIR__ . '/../../../config/private.key', null, false)
+            new CryptKey(__DIR__ . '/../../../security/private.key', null, false),
+            null,
+            $scopes
         );
         
         return $accessToken;

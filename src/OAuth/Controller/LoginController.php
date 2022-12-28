@@ -60,11 +60,17 @@ class LoginController
 
         try {
             $client = $this->clientRepository->findOneByName('andersbjorkland2.se');
+            $accessToken = $this->accessTokenRepository->getNewToken($client, ['email'], $user->getId());
         } catch (\Throwable $e) {
+            $this->clientRepository->getConnection()->quit();
             return Response::json(
-                ['error' => 'Database failure.']
+                [
+                    'error' => 'Database failure.',
+                    'message' => $e->getMessage()
+                ]
             )->withStatus(StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR);
         }
+        
 
         $connection = $this->clientRepository->getConnection();
         $connection->quit();
@@ -72,7 +78,7 @@ class LoginController
         return Response::json(
             [
                 'message' => 'User logged in successfully.',
-                'token' => '$accessToken->getIdentifier()',
+                'token' => (string) $accessToken,
                 'type' => 'Bearer'
             ]
         )->withStatus(StatusCodeInterface::STATUS_OK);
