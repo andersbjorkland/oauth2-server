@@ -8,15 +8,10 @@ use App\Model\User;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Entities\UserEntityInterface;
 use League\OAuth2\Server\Repositories\UserRepositoryInterface;
-use React\MySQL\ConnectionInterface;
-use React\MySQL\QueryResult;
 use function React\Async\await;
 
-class UserRepository implements UserRepositoryInterface
+class UserRepository extends AbstractRepository implements UserRepositoryInterface
 {
-    public function __construct(
-        private readonly ConnectionInterface $connection
-    ){}
 
     /**
      * @throws \Throwable
@@ -29,7 +24,6 @@ class UserRepository implements UserRepositoryInterface
         ));
         
         assert($userData instanceof \React\MySQL\QueryResult);
-        $this->connection->quit();
 
         return count($userData->resultRows) > 0 ? $this->constructUser($userData->resultRows[0]) : null;
     }
@@ -45,8 +39,6 @@ class UserRepository implements UserRepositoryInterface
         ));
 
         assert($userData instanceof \React\MySQL\QueryResult);
-        $this->connection->quit();
-        
 
         return count($userData->resultRows) > 0 ? $this->constructUser($userData->resultRows[0]) : null;
     }

@@ -32,11 +32,9 @@ class ClientManager implements EntityManagerInterface
             $entity->getSecret()
         ])->then(
             function (QueryResult $result) {
-                $this->connection->quit();
                 return true;
             },
             function (\Exception $exception) {
-                $this->connection->quit();
                 throw $exception;
             },
         ));
@@ -57,11 +55,9 @@ class ClientManager implements EntityManagerInterface
             $entity->getId()
         ])->then(
             function (QueryResult $result) {
-                $this->connection->quit();
                 return true;
             },
             function (\Exception $exception) {
-                $this->connection->quit();
                 throw $exception;
             },
         ));
@@ -77,11 +73,9 @@ class ClientManager implements EntityManagerInterface
         return await($this->connection->query($sql, [$entity->getId()])
             ->then(
                 function (QueryResult $result) {
-                    $this->connection->quit();
                     return true;
                 },
                 function (\Exception $exception) {
-                    $this->connection->quit();
                     throw $exception;
                 },
             ));
@@ -98,14 +92,17 @@ class ClientManager implements EntityManagerInterface
         return await($this->connection->query($sql, [$id])
             ->then(
                 function (QueryResult $result) {
-                    $this->connection->quit();
                     $firstResult = $result->resultRows[0] ?? null;
                     return $firstResult ? ClientRepository::createClientFromRow($firstResult) : null;
                 },
                 function (\Exception $exception) {
-                    $this->connection->quit();
                     throw $exception;
                 },
             ));
+    }
+
+    public function getConnection(): ConnectionInterface
+    {
+        return $this->connection;
     }
 }

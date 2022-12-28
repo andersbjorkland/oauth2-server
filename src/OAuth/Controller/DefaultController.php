@@ -53,6 +53,17 @@ class DefaultController
                     },
                 ));
         assert(is_bool($createScopeSuccess));
+        
+        $createAccessTokenSuccess = await($this->connection->query(InitializeDatabase::getCreateAccessTokenTableSQL())
+                ->then(
+                    function (QueryResult $result) {
+                        return true;
+                    },
+                    function (\Exception $exception) {
+                        return false;
+                    },
+                ));
+        assert(is_bool($createAccessTokenSuccess));
 
         $this->connection->quit();
 
@@ -60,6 +71,7 @@ class DefaultController
             'createdUserTable' => $createUserSuccess,
             'createdClientTable' => $createClientSuccess,
             'createdScopeTable' => $createScopeSuccess,
+            'createdAccessTokenTable' => $createAccessTokenSuccess,
         ]);
     }
 }

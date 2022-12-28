@@ -1,6 +1,10 @@
 <?php
 
+use App\Database\Manager\AccessTokenManager;
 use App\Database\Manager\UserManager;
+use App\Database\Repository\AccessTokenRepository;
+use App\Database\Repository\ClientRepository;
+use App\Database\Repository\ScopeRepository;
 use App\Database\Repository\UserRepository;
 use App\OAuth\Controller\DefaultController;
 use App\OAuth\Controller\LoginController;
@@ -22,6 +26,10 @@ $container = new Container([
     },
     UserManager::class => fn(ConnectionInterface $connection) => new UserManager($connection),
     UserRepository::class => fn(ConnectionInterface $connection) => new UserRepository($connection),
+    ScopeRepository::class => fn(ConnectionInterface $connection) => new ScopeRepository($connection),
+    ClientRepository::class => fn(ConnectionInterface $connection) => new ClientRepository($connection),
+    AccessTokenManager::class => fn(ConnectionInterface $connection, ClientRepository $clientRepository) => new AccessTokenManager($connection, $clientRepository),
+    AccessTokenRepository::class => fn(AccessTokenManager $accessTokenManager) => new AccessTokenRepository($accessTokenManager),
 ]);
 
 $app = new App($container);

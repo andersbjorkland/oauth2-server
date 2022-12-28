@@ -114,4 +114,9 @@ class UserManager implements EntityManagerInterface
         
         return $response;
     }
+
+    public function getConnection(): ConnectionInterface
+    {
+        return $this->connection;
+    }
 }

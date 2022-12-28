@@ -106,4 +106,9 @@ class ScopeManager implements EntityManagerInterface
         );
         
     }
+
+    public function getConnection(): ConnectionInterface
+    {
+        return $this->connection;
+    }
 }

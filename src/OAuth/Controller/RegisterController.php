@@ -61,6 +61,7 @@ class RegisterController
         try {
             $result = $this->userManager->create($user);
         } catch (\Throwable $exception) {
+            $this->userManager->getConnection()->quit();
             return Response::json(
                 [
                     'error' => str_contains($exception->getMessage(), 'Duplicate entry')
@@ -69,7 +70,9 @@ class RegisterController
                 ]
             )->withStatus(StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR);
         }
-        
+
+        $this->userManager->getConnection()->quit();
+
         return Response::json(
             ['message' => 'User created successfully.']
         )->withStatus(StatusCodeInterface::STATUS_CREATED);
@@ -105,6 +108,8 @@ class RegisterController
         try {
             $result = $this->clientManager->create($client);
         } catch (\Throwable $exception) {
+            $this->clientManager->getConnection()->quit();
+
             return Response::json(
                 [
                     'error' => str_contains($exception->getMessage(), 'Duplicate entry')
@@ -113,7 +118,9 @@ class RegisterController
                 ]
             )->withStatus(StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR);
         }
-        
+
+        $this->clientManager->getConnection()->quit();
+
         return Response::json(
             ['message' => 'Client created successfully.']
         )->withStatus(StatusCodeInterface::STATUS_CREATED);
@@ -142,6 +149,9 @@ class RegisterController
         try {
             $result = $this->scopeManager->create($scope);
         } catch (\Throwable $exception) {
+
+            $this->scopeManager->getConnection()->quit();
+
             return Response::json(
                 [
                     'error' => str_contains($exception->getMessage(), 'Duplicate entry')
@@ -150,7 +160,9 @@ class RegisterController
                 ]
             )->withStatus(StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR);
         }
-        
+
+        $this->scopeManager->getConnection()->quit();
+
         return Response::json(
             ['message' => 'Scope created successfully.']
         )->withStatus(StatusCodeInterface::STATUS_CREATED);

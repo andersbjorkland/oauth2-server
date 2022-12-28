@@ -7,13 +7,36 @@ namespace App\Database\Repository;
 use App\Model\Scope;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
+use React\MySQL\QueryResult;
+use function React\Async\await;
 
-class ScopeRepository implements ScopeRepositoryInterface
+class ScopeRepository extends AbstractRepository implements ScopeRepositoryInterface
 {
 
+    /**
+     * @param $identifier
+     * @return Scope|null
+     * @throws \Throwable
+     */
     public function getScopeEntityByIdentifier($identifier): ?Scope
     {
-        return null;
+        $sql = 'SELECT * FROM scope WHERE id = ?';
+        
+        $result = await($this->connection->query($sql, [$identifier])
+            ->then(
+                function (QueryResult $result) {
+                    return $result->resultRows;
+                },
+                function (\Exception $exception) {
+                    throw $exception;
+                },
+            ));
+        
+        if (count($result) === 0) {
+            return null;
+        }
+        
+        return self::createScopeFromRow($result[0]);
     }
 
     /**
