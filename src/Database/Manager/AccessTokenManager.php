@@ -25,14 +25,17 @@ class AccessTokenManager implements EntityManagerInterface
     public function create(mixed $entity): bool
     {
         assert($entity instanceof AccessToken);
-        $sql = 'INSERT INTO access_token (id, client_id, user_id, scopes, expiry_date_time) VALUES (?, ?, ?, ?, ?)';
-        $result = await($this->connection->query($sql, [
-            $entity->getId() ?? UuidGenerator::getCompactUuid4(), 
-            $entity->getClient()->getId(), 
-            $entity->getUserIdentifier(),
-            json_encode($entity->getScopes()), 
-            $entity->getExpiryDateTime()->format('Y-m-d H:i:s')
-        ])->then(
+        
+        $sql = 'INSERT INTO access_token (id, client_id, user_id, expiry_date_time) VALUES (?, ?, ?, ?)';
+        $relationSql = 'INSERT INTO access_token_scope (access_token_id, scope_id) VALUES (?, ?)';
+        $result = await(
+            $this->connection->query($sql, [
+                $entity->getId() ?? UuidGenerator::getCompactUuid4(), 
+                $entity->getClient()->getId(), 
+                $entity->getUserIdentifier(),
+                json_encode($entity->getScopes()), 
+                $entity->getExpiryDateTime()->format('Y-m-d H:i:s')
+            ])->then(
             function (QueryResult $result) {
                 return true;
             },
@@ -42,7 +45,23 @@ class AccessTokenManager implements EntityManagerInterface
             },
         ));
         
-        $this->connection->quit();
+        foreach ($entity->getScopes() as $scope) {
+            
+            $result = await(
+                $this->connection->query($relationSql, [
+                    $entity->getId() ?? UuidGenerator::getCompactUuid4(), 
+                    $scope->getIdentifier()
+                ])->then(
+                function (QueryResult $result) {
+                    return true;
+                },
+                function (\Exception $exception) {
+                    $this->connection->quit();
+                    throw $exception;
+                }
+            ));
+            
+        }
         
         return $result;
     }

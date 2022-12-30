@@ -26,8 +26,27 @@ class InitializeDatabase
     
     public static function getCreateAccessTokenTableSQL(): string
     {
-        $sql = "CREATE TABLE IF NOT EXISTS access_token (id BINARY(32) NOT NULL, user_id BINARY(32) DEFAULT NULL COMMENT '(Type:uuid)', client_id BINARY(32) NOT NULL, expiry_date_time DATETIME NOT NULL COMMENT '(Type:datetime_immutable)', scopes LONGTEXT NOT NULL COMMENT '(Type:json)', PRIMARY KEY(id), FOREIGN KEY (user_id) REFERENCES user(id), FOREIGN KEY (client_id) REFERENCES client(id) ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB";
+        $sql = "CREATE TABLE IF NOT EXISTS access_token (id BINARY(32) NOT NULL, user_id BINARY(32) DEFAULT NULL COMMENT '(Type:uuid)', client_id BINARY(32) NOT NULL, expiry_date_time DATETIME NOT NULL COMMENT '(Type:datetime_immutable)', PRIMARY KEY(id), FOREIGN KEY (user_id) REFERENCES user(id), FOREIGN KEY (client_id) REFERENCES client(id) ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB";
         return $sql;
     }
+    
+    public static function getCreateAccessTokenScopeTableSQL(): string
+    {
+        $sql = "CREATE TABLE IF NOT EXISTS access_token_scope (access_token_id BINARY(32) NOT NULL, scope_id BINARY(32) NOT NULL, INDEX IDX_2B0E0B9B5F37A13B (access_token_id), INDEX IDX_2B0E0B9B5E237E06 (scope_id), PRIMARY KEY(access_token_id, scope_id), FOREIGN KEY (access_token_id) REFERENCES access_token(id), FOREIGN KEY (scope_id) REFERENCES scope(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB";
+        return $sql;
+    }
+    
+    public static function getCreateAuthorizationCodeTableSQL(): string
+    {
+        $sql = "CREATE TABLE IF NOT EXISTS authorization_code (id BINARY(32) NOT NULL, user_id BINARY(32) DEFAULT NULL COMMENT '(Type:uuid)', client_id BINARY(32) NOT NULL, expiry_date_time DATETIME NOT NULL COMMENT '(Type:datetime_immutable)', redirect_uri VARCHAR(255) NOT NULL, PRIMARY KEY(id), FOREIGN KEY (user_id) REFERENCES user(id), FOREIGN KEY (client_id) REFERENCES client(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB";
+        return $sql;
+    }
+    
+    public static function getCreateAuthorizationCodeScopeTableSQL(): string
+    {
+        $sql = "CREATE TABLE IF NOT EXISTS authorization_code_scope (authorization_code_id BINARY(32) NOT NULL, scope_id BINARY(32) NOT NULL, INDEX IDX_3B0E0B9B5F37A13B (authorization_code_id), INDEX IDX_3B0E0B9B5E237E06 (scope_id), PRIMARY KEY(authorization_code_id, scope_id), FOREIGN KEY (authorization_code_id) REFERENCES authorization_code(id), FOREIGN KEY (scope_id) REFERENCES scope(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB";
+        return $sql;
+    }
+    
 
 }

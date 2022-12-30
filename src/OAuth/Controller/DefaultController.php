@@ -64,6 +64,39 @@ class DefaultController
                     },
                 ));
         assert(is_bool($createAccessTokenSuccess));
+        
+        $createAccessTokenScopeStatus = await($this->connection->query(InitializeDatabase::getCreateAccessTokenScopeTableSQL())
+                ->then(
+                    function (QueryResult $result) {
+                        return true;
+                    },
+                    function (\Exception $exception) {
+                        return false;
+                    },
+                ));
+        assert(is_bool($createAccessTokenScopeStatus));
+        
+        $createAuthorizationCodeSuccess = await($this->connection->query(InitializeDatabase::getCreateAuthorizationCodeTableSQL())
+                ->then(
+                    function (QueryResult $result) {
+                        return true;
+                    },
+                    function (\Exception $exception) {
+                        return false;
+                    },
+                ));
+        assert(is_bool($createAuthorizationCodeSuccess));
+        
+        $createAuthorizationCodeScopeSuccess = await($this->connection->query(InitializeDatabase::getCreateAuthorizationCodeScopeTableSQL())
+                ->then(
+                    function (QueryResult $result) {
+                        return true;
+                    },
+                    function (\Exception $exception) {
+                        return false;
+                    },
+                ));
+        assert(is_bool($createAuthorizationCodeScopeSuccess));
 
         $this->connection->quit();
 
@@ -72,6 +105,9 @@ class DefaultController
             'createdClientTable' => $createClientSuccess,
             'createdScopeTable' => $createScopeSuccess,
             'createdAccessTokenTable' => $createAccessTokenSuccess,
+            'createdAccessTokenScopeTable' => $createAccessTokenScopeStatus,
+            'createdAuthorizationCodeTable' => $createAuthorizationCodeSuccess,
+            'createdAuthorizationCodeScopeTable' => $createAuthorizationCodeScopeSuccess,
         ]);
     }
 }

@@ -12,6 +12,7 @@ use App\OAuth\Controller\RegisterController;
 use Dotenv\Dotenv;
 use FrameworkX\App;
 use FrameworkX\Container;
+use League\OAuth2\Server\AuthorizationServer;
 use React\MySQL\ConnectionInterface;
 use React\MySQL\Factory;
 
@@ -30,6 +31,21 @@ $container = new Container([
     ClientRepository::class => fn(ConnectionInterface $connection) => new ClientRepository($connection),
     AccessTokenManager::class => fn(ConnectionInterface $connection, ClientRepository $clientRepository) => new AccessTokenManager($connection, $clientRepository),
     AccessTokenRepository::class => fn(AccessTokenManager $accessTokenManager) => new AccessTokenRepository($accessTokenManager),
+    AuthorizationServer::class => function (
+        ClientRepository $clientRepository, 
+        ScopeRepository $scopeRepository, 
+        AccessTokenRepository $accessTokenRepository
+    ) {
+        $server = new AuthorizationServer(
+            $clientRepository,
+            $accessTokenRepository,
+            $scopeRepository,
+            file_get_contents(__DIR__ . '/../security/private.key'),
+            file_get_contents(__DIR__ . '/../security/defuse.key')
+        );
+        
+        return $server;
+    },
 ]);
 
 $app = new App($container);

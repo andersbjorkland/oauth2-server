@@ -64,4 +64,31 @@ class ScopeRepository extends AbstractRepository implements ScopeRepositoryInter
             $row['id']
         );
     }
+
+    /**
+     * @param array $scopeIds
+     * @return array|Scope[]
+     * @throws \Throwable
+     */
+    public function getScopesByIdentifiers(array $scopeIds): array
+    {
+        $sql = 'SELECT * FROM scope WHERE id IN (?)';
+        
+        $result = await($this->connection->query($sql, [$scopeIds])
+            ->then(
+                function (QueryResult $result) {
+                    return $result->resultRows;
+                },
+                function (\Exception $exception) {
+                    throw $exception;
+                },
+            ));
+        
+        $scopes = [];
+        foreach ($result as $row) {
+            $scopes[] = self::createScopeFromRow($row);
+        }
+        
+        return $scopes;
+    }
 }
