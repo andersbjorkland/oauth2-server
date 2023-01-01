@@ -74,20 +74,23 @@ class AccessTokenManager implements EntityManagerInterface
     public function delete(mixed $entity): bool
     {
         assert($entity instanceof AccessToken);
+        
+        return $this->deleteById($entity->getId());
+    }
+    
+    public function deleteById(string $id): bool
+    {
         $sql = 'DELETE FROM access_token WHERE id = ?';
         $result = await($this->connection->query($sql, [
-            $entity->getId()
+            $id
         ])->then(
             function (QueryResult $result) {
                 return true;
             },
             function (\Exception $exception) {
-                $this->connection->quit();
                 throw $exception;
             },
         ));
-        
-        $this->connection->quit();
         
         return $result;
     }
@@ -107,12 +110,10 @@ class AccessTokenManager implements EntityManagerInterface
                 return $result->resultRows;
             },
             function (\Exception $exception) {
-                $this->connection->quit();
                 throw $exception;
             },
         ));
         
-        $this->connection->quit();
         
         if (count($result) === 0) {
             return null;
@@ -146,13 +147,9 @@ class AccessTokenManager implements EntityManagerInterface
                 return true;
             },
             function (\Exception $exception) {
-                $this->connection->quit();
                 throw $exception;
             },
         ));
-        
-        $this->connection->quit();
-        
         return $result;
     }
 

@@ -37,7 +37,6 @@ class AuthorizationCodeManager implements EntityManagerInterface
                     return true;
                 },
                 function (\Exception $exception) {
-                    $this->connection->quit();
                     throw $exception;
                 },
         ));
@@ -53,7 +52,6 @@ class AuthorizationCodeManager implements EntityManagerInterface
                         return true;
                     },
                     function (\Exception $exception) {
-                        $this->connection->quit();
                         throw $exception;
                     },
             ));
@@ -80,7 +78,6 @@ class AuthorizationCodeManager implements EntityManagerInterface
                     return true;
                 },
                 function (\Exception $exception) {
-                    $this->connection->quit();
                     throw $exception;
                 },
         ));
@@ -101,7 +98,6 @@ class AuthorizationCodeManager implements EntityManagerInterface
                         return true;
                     },
                     function (\Exception $exception) {
-                        $this->connection->quit();
                         throw $exception;
                     },
             ));
@@ -120,7 +116,6 @@ class AuthorizationCodeManager implements EntityManagerInterface
                     return true;
                 },
                 function (\Exception $exception) {
-                    $this->connection->quit();
                     throw $exception;
                 },
         ));
@@ -131,42 +126,14 @@ class AuthorizationCodeManager implements EntityManagerInterface
     public function delete(mixed $entity): bool
     {
         assert($entity instanceof AuthorizationCode);
-        $sql = 'DELETE FROM authorization_code WHERE id = ?';
-        $relationSql = 'DELETE FROM authorization_code_scope WHERE authorization_code_id = ?';
-        
-        $result = await(
-            $this->connection->query($relationSql, [
-                $entity->getId()
-            ])->then(
-                function (QueryResult $result) {
-                    return true;
-                },
-                function (\Exception $exception) {
-                    $this->connection->quit();
-                    throw $exception;
-                },
-        ));
-        
-        $result = await(
-            $this->connection->query($sql, [
-                $entity->getId()
-            ])->then(
-                function (QueryResult $result) {
-                    return true;
-                },
-                function (\Exception $exception) {
-                    $this->connection->quit();
-                    throw $exception;
-                },
-        ));
-        
-        return true;
+        return $this->deleteById($entity->getId());
     }
     
     public function deleteById(string $id): bool
     {
         $sql = 'DELETE FROM authorization_code WHERE id = ?';
-        
+        $relationSql = 'DELETE FROM authorization_code_scope WHERE authorization_code_id = ?';
+
         $result = await(
             $this->connection->query($sql, [
                 $id
@@ -175,10 +142,21 @@ class AuthorizationCodeManager implements EntityManagerInterface
                     return true;
                 },
                 function (\Exception $exception) {
-                    $this->connection->quit();
                     throw $exception;
                 },
         ));
+
+        $result = await(
+            $this->connection->query($sql, [
+                $id
+            ])->then(
+                function (QueryResult $result) {
+                    return true;
+                },
+                function (\Exception $exception) {
+                    throw $exception;
+                },
+            ));
         
         return true;
     }
@@ -196,7 +174,6 @@ class AuthorizationCodeManager implements EntityManagerInterface
                     return $result->resultRows;
                 },
                 function (\Exception $exception) {
-                    $this->connection->quit();
                     throw $exception;
                 },
         ));
@@ -209,7 +186,6 @@ class AuthorizationCodeManager implements EntityManagerInterface
                     return $result->resultRows;
                 },
                 function (\Exception $exception) {
-                    $this->connection->quit();
                     throw $exception;
                 },
         ));

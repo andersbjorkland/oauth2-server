@@ -30,11 +30,9 @@ class ScopeManager implements EntityManagerInterface
             $entity->getDescription()
         ])->then(
             function (QueryResult $result) {
-                $this->connection->quit();
                 return true;
             },
             function (\Exception $exception) {
-                $this->connection->quit();
                 throw $exception;
             },
         ));
@@ -50,11 +48,9 @@ class ScopeManager implements EntityManagerInterface
         return await($this->connection->query($sql, [$entity->getName(), $entity->getDescription(), $entity->getId()])
             ->then(
                 function (QueryResult $result) {
-                    $this->connection->quit();
                     return true;
                 },
                 function (\Exception $exception) {
-                    $this->connection->quit();
                     throw $exception;
                 },
             ));
@@ -66,18 +62,23 @@ class ScopeManager implements EntityManagerInterface
     public function delete(mixed $entity): bool
     {
         assert($entity instanceof Scope);
+        return $this->deleteById($entity->getId());
+    }
+    
+    public function deleteById(string $id): bool
+    {
         $sql = 'DELETE FROM scope WHERE id = ?';
-        return await($this->connection->query($sql, [$entity->getId()])
+        await($this->connection->query($sql, [$id])
             ->then(
                 function (QueryResult $result) {
-                    $this->connection->quit();
                     return true;
                 },
                 function (\Exception $exception) {
-                    $this->connection->quit();
                     throw $exception;
                 },
             ));
+        
+        return true;
     }
 
     public function get(string $id): mixed
@@ -86,11 +87,9 @@ class ScopeManager implements EntityManagerInterface
         $result = await($this->connection->query($sql, [$id])
             ->then(
                 function (QueryResult $result) {
-                    $this->connection->quit();
                     return $result->resultRows[0] ?? null;
                 },
                 function (\Exception $exception) {
-                    $this->connection->quit();
                     throw $exception;
                 },
             ));

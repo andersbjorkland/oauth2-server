@@ -69,8 +69,13 @@ class ClientManager implements EntityManagerInterface
     public function delete(mixed $entity): bool
     {
         assert($entity instanceof Client);
+        return $this->deleteById($entity->getId());
+    }
+    
+    public function deleteById(string $id): bool
+    {
         $sql = 'DELETE FROM client WHERE id = ?';
-        return await($this->connection->query($sql, [$entity->getId()])
+        return await($this->connection->query($sql, [$id])
             ->then(
                 function (QueryResult $result) {
                     return true;

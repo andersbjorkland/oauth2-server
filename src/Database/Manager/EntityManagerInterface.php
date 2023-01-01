@@ -9,6 +9,7 @@ interface EntityManagerInterface
     public function create(mixed $entity): bool;
     public function update(mixed $entity): bool;
     public function delete(mixed $entity): bool;
+    public function deleteById(string $id): bool;
     public function get(string $id): mixed;
     public function getConnection(): ConnectionInterface;
 }
