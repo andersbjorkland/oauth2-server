@@ -20,9 +20,10 @@ use React\MySQL\{ConnectionInterface, Factory};
 class ContainerConfig
 {
     
-    public function __construct()
+    public function __construct(string $envFile = '.env')
     {
-        $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
+        
+        $dotenv = Dotenv::createImmutable( __DIR__ . '/../../', $envFile);
         $dotenv->load();   
     }
 
