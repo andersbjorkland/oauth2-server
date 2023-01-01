@@ -13,8 +13,7 @@
         "league/oauth2-server": "^8.3",
         "clue/framework-x": "dev-main",
         "vlucas/phpdotenv": "^5.5",
-        "react/mysql": "^0.6@dev",
-      "ext-http": "*"
+        "react/mysql": "^0.6@dev"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5"

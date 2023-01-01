@@ -22,7 +22,7 @@ class UserManagerTest extends TestCase
     {
         parent::setUp();
         
-        $this->connection = (new Factory())->createLazyConnection('mysql://test:password@localhost:3307/test?idle=0.1&timeout=0.1');
+        $this->connection = (new Factory())->createLazyConnection($_ENV['MYSQL_URI']);
     
         $this->userManager = new UserManager($this->connection);
 
@@ -123,7 +123,7 @@ class UserManagerTest extends TestCase
 
     public static function tearDownAfterClass(): void
     {
-        $connection = (new Factory())->createLazyConnection('mysql://test:password@localhost:3307/test');
+        $connection = (new Factory())->createLazyConnection($_ENV['MYSQL_URI']);
         try {
             await($connection->query('TRUNCATE TABLE user'));
             await($connection->quit());

@@ -6,10 +6,12 @@ namespace App\Config;
 
 use App\Database\Manager\AccessTokenManager;
 use App\Database\Manager\AuthorizationCodeManager;
+use App\Database\Manager\RefreshTokenManager;
 use App\Database\Manager\UserManager;
 use App\Database\Repository\AccessTokenRepository;
 use App\Database\Repository\AuthorizationCodeRepository;
 use App\Database\Repository\ClientRepository;
+use App\Database\Repository\RefreshTokenRepository;
 use App\Database\Repository\ScopeRepository;
 use App\Database\Repository\UserRepository;
 use Dotenv\Dotenv;
@@ -54,6 +56,13 @@ class ContainerConfig
             AuthorizationCodeRepository::class => fn(
                 AuthorizationCodeManager $authorizationCodeManager
             ) => new AuthorizationCodeRepository($authorizationCodeManager),
+            RefreshTokenManager::class => fn(
+                ConnectionInterface $connection,
+                AccessTokenManager $accessTokenManager,
+            ) => new RefreshTokenManager($connection, $accessTokenManager),
+            RefreshTokenRepository::class => fn(
+                RefreshTokenManager $refreshTokenManager
+            ) => new RefreshTokenRepository($refreshTokenManager),
             AuthorizationServer::class => function (
                 ClientRepository      $clientRepository,
                 ScopeRepository       $scopeRepository,

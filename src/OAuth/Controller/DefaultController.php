@@ -97,6 +97,17 @@ class DefaultController
                     },
                 ));
         assert(is_bool($createAuthorizationCodeScopeSuccess));
+        
+        $createRefreshTokenSuccess = await($this->connection->query(InitializeDatabase::getCreateRefreshTokenTableSQL())
+                ->then(
+                    function (QueryResult $result) {
+                        return true;
+                    },
+                    function (\Exception $exception) {
+                        return false;
+                    },
+                ));
+        assert(is_bool($createRefreshTokenSuccess));
 
         $this->connection->quit();
 
@@ -108,6 +119,7 @@ class DefaultController
             'createdAccessTokenScopeTable' => $createAccessTokenScopeStatus,
             'createdAuthorizationCodeTable' => $createAuthorizationCodeSuccess,
             'createdAuthorizationCodeScopeTable' => $createAuthorizationCodeScopeSuccess,
+            'createdRefreshTokenTable' => $createRefreshTokenSuccess
         ]);
     }
 }

@@ -6,9 +6,14 @@ namespace App\Database\Service;
 
 class InitializeDatabase
 {
+    public static function getCreateDatabase(string $databaseName): string
+    {
+        return "CREATE DATABASE IF NOT EXISTS $databaseName";
+    }
+    
     public static function getCreateUserTableSQL(): string
     {
-        return "CREATE TABLE IF NOT EXISTS user (id BINARY(32) NOT NULL COMMENT '(Type:uuid4)', email VARCHAR(180) NOT NULL, roles LONGTEXT NOT NULL COMMENT '(DC2Type:json)', password VARCHAR(255) NOT NULL, UNIQUE INDEX UNIQ_8D93D649E7927C74 (email), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB";
+        return "CREATE TABLE IF NOT EXISTS user (id BINARY(32) NOT NULL, email VARCHAR(180) NOT NULL, roles LONGTEXT NOT NULL, password VARCHAR(255) NOT NULL, UNIQUE INDEX UNIQ_8D93D649E7927C74 (email), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB";
     }
     
     public static function getCreateClientTableSQL(): string
@@ -48,5 +53,10 @@ class InitializeDatabase
         return $sql;
     }
     
-
+    public static function getCreateRefreshTokenTableSQL(): string
+    {
+        $sql = "CREATE TABLE IF NOT EXISTS refresh_token (id BINARY(32) NOT NULL, access_token_id BINARY(32) NOT NULL, expiry_date_time DATETIME NOT NULL, PRIMARY KEY(id), FOREIGN KEY (access_token_id) REFERENCES access_token(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB";
+        return $sql;
+    }
+    
 }
