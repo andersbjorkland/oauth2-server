@@ -35,11 +35,9 @@ class UserManager implements EntityManagerInterface
             ])
             ->then(
                 function (QueryResult $result) {
-                    $this->connection->quit();
                     return true;
                 },
                 function (\Exception $exception) {
-                    $this->connection->quit();
                     throw $exception;
                 },
             ));
@@ -47,76 +45,93 @@ class UserManager implements EntityManagerInterface
         return $response;
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function update(mixed $entity): bool
     {
         assert($entity instanceof User);
         $sql = 'UPDATE user SET email = ?, password = ? WHERE id = ?';
-        try {
-            $response = await($this->connection->query($sql, [$entity->getEmail(), $entity->getPassword(), $entity->getId()])
-                ->then(
-                    function (QueryResult $result) {
-                        $this->connection->quit();
-                        return true;
-                    },
-                    function (\Exception $exception) {
-                        $this->connection->quit();
-                        return false;
-                    },
-                ));
-        } catch (\Throwable $e) {
-            return false;
-        }
+        
+        $response = await($this->connection->query($sql, [$entity->getEmail(), $entity->getPassword(), $entity->getId()])
+            ->then(
+                function (QueryResult $result) {
+                    return true;
+                },
+                function (\Exception $exception) {
+                    throw $exception;
+                },
+            ));
         
         return $response;
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function delete(mixed $entity): bool
     {
         assert($entity instanceof User);
-        $sql = 'DELETE FROM user WHERE id = ?';
-        try {
-            $response = await($this->connection->query($sql, [$entity->getId()])
-                ->then(
-                    function (QueryResult $result) {
-                        $this->connection->quit();
-                        return true;
-                    },
-                    function (\Exception $exception) {
-                        $this->connection->quit();
-                        return false;
-                    },
-                ));
-        } catch (\Throwable $e) {
-            return false;
-        }
-        
-        return $response;
+        return $this->deleteById($entity->getId());
     }
 
+    /**
+     * @throws \Throwable
+     */
+    public function deleteById(string $id): bool
+    {
+        $sql = 'DELETE FROM user WHERE id = ?';
+        $response = await($this->connection->query($sql, [$id])
+            ->then(
+                function (QueryResult $result) {
+                    return true;
+                },
+                function (\Exception $exception) {
+                    throw $exception;
+                },
+            ));
+        
+        return true;
+    }
+
+    /**
+     * @param string $id
+     * @return User|null
+     * @throws \Throwable
+     */
     public function get(string $id): mixed
     {
         $sql = 'SELECT * FROM user WHERE id = ?';
-        try {
-            $response = await($this->connection->query($sql, [$id])
-                ->then(
-                    function (QueryResult $result) {
-                        $this->connection->quit();
-                        return $result->resultRows[0];
-                    },
-                    function (\Exception $exception) {
-                        $this->connection->quit();
-                        return null;
-                    },
-                ));
-        } catch (\Throwable $e) {
+        
+        $response = await($this->connection->query($sql, [$id])
+            ->then(
+                function (QueryResult $result) {
+                    return $result->resultRows;
+                },
+                function (\Exception $exception) {
+                    throw $exception;
+                },
+            ));
+        
+        if (empty($response)) {
             return null;
         }
         
-        return $response;
+        return $this->createEntity($response[0]);
     }
 
     public function getConnection(): ConnectionInterface
     {
         return $this->connection;
+    }
+    
+    protected function createEntity(array $data): User
+    {
+        return new User(
+            email: $data['email'],
+            password: $data['password'],
+            id: $data['id'],
+            roles: json_decode($data['roles'], true)
+        );
     }
 }
